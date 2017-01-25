@@ -59,8 +59,6 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
   Hash j = 210685229342;
     
   
-  printf("%lli\n",valor);
-
   //Quando a raiz eh null
   if(arvore == NULL){
     arvore = criaNodo(ordem, true);
@@ -69,7 +67,7 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     return arvore;
   }
   //Quando tem espaco para inserir na raiz
-  else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1){
+  else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1 && arvore->folha){
     //TODO
     //arrumar ordenacao dos offsets
     arvore->quantidadeKeys++;
@@ -78,7 +76,7 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     return arvore;
   }
   //Split na raiz, quando nao tem mais espaco para inserir
-  else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1){
+  else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha){
     nodo_t *filhoDir, *pai;
     int count = 0;
     
@@ -89,13 +87,10 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     arvore->keys[(arvore->quantidadeKeys)-1] = valor;
     sort(arvore->keys,(arvore->keys+arvore->quantidadeKeys));
     arvore->quantidadeKeys = count =((ordem/2));
-    
-    printf("%d\n",count);
-    
+       
     while(count < ordem){
       filhoDir->quantidadeKeys++;
       filhoDir->keys[(filhoDir->quantidadeKeys)-1] = arvore->keys[count];
-      printf("%lld\n",arvore->keys[count]);
       count++;
     }
 
@@ -113,17 +108,22 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     return pai;
   }
   else{
-    printf("%p\n", buscaInsercao(arvore,j));
+	nodo_t *jose = buscaInsercao(arvore,j);
+	int j = 0;
+	
+	while(j < jose->quantidadeKeys){
+	  printf("%lld\n",jose->keys[j]);
+	  j++;
+	}
+	return arvore;
   }
   
   return 0;
 }
 
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
-  if(nodoAtual->folha) {
-    printf("%lld\n",nodoAtual->keys[0]);
-    return nodoAtual;
-  }
+  if(nodoAtual->folha) return nodoAtual;
+ 
  
   int count = 0, flag = 0;
   
@@ -134,6 +134,7 @@ nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
   
   if(flag = 1) return buscaInsercao(nodoAtual->filhos[count],valor);
   else return buscaInsercao(nodoAtual->filhos[nodoAtual->quantidadeFilhos-1],valor);
+ 
 }
 
 FILE* abrirArquivo(char arquivoEntrada[]){
