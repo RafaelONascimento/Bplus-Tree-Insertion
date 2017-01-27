@@ -104,7 +104,7 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     pai->quantidadeFilhos = 2;
     pai->filhos[0] = arvore;
     pai->filhos[1] = filhoDir; 
-    
+
     return pai;
   }
   else{
@@ -122,70 +122,81 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
   int count = 0, flag = 1;
 
   if(nodoInserimento->quantidadeKeys < ordem-1){
-	nodoInserimento->quantidadeKeys++;
-	nodoInserimento->keys[nodoInserimento->quantidadeKeys-1] = valor;
-	sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+	nodoInserimento = sortMiracolosoConInsercione(nodoInserimento, valor, ordem,filho);
 	return nodoInserimento;
   }
   else{
 	filhoDir = criaNodo(ordem,true);
 	pai = criaNodo(ordem,false);
 	paiAux = nodoInserimento->pai;
+		
+	nodoInserimento = sortMiracolosoConInsercione(nodoInserimento, valor, ordem,filho);
 	
+	//Separa as polentas do nene
+	nodoInserimento->quantidadeKeys = count =((ordem/2));
+	
+	while(count < ordem){
+	  filhoDir->quantidadeKeys++;
+	  filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+	  count++;
+	}
+	
+	pai->quantidadeKeys++;
+	pai->keys[0] = filhoDir->keys[0];
+    
+	filhoDir->pai = pai;
+	nodoInserimento->pai = pai;
+	nodoInserimento->prox = filhoDir;
+	
+	pai->quantidadeFilhos = 2;
+	pai->filhos[0] = nodoInserimento;
+	pai->filhos[1] = filhoDir; 
+	
+	return pai;
+  }
+}
+
+nodo_t* sortMiracolosoConInsercione(nodo_t *nodoInserimento, Hash valor, int ordem, nodo_t *filho){
+  int count = 0 , flag = 1;
+  
+  if(nodoInserimento->folha){
 	nodoInserimento->quantidadeKeys++;
 	nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor;
-	if(nodoInserimento->folha){
-	  sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+	sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+  }
+  else{
+	Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
+	nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
+	int countAux = 0;
+	  
+	count = 0; 
+	while(count < nodoInserimento->quantidadeKeys){
+	  hashAuxiliar[count] = nodoInserimento->keys[count];
+	  count++;
 	}
-	else{
-	  Hash hashAuxiliar;
-	  nodo_t **filhosAux;
-	  
-	  while(count < nodoInserimento->quantidadeKeys){
-		hashAuxiliar[count] = nodoInserimento->keys[count];
-		count++;
-	  }
-	  
-	  count = 0;
-	  while(count < nodoInserimento->quantidadeFilhos){
-		filhosAux[count] = nodoInserimento->filhos[count];
-		count++;
-	  }
-	  
-	  count = 0;
-	  while(count < nodoInserimento->quantidadeKeys && flag)
-		if(nodoInserimento->keys[count] > valor) flag = 0;
-	  
-	  
-		
+   
+	count = 0;
+	while(count < nodoInserimento->quantidadeFilhos){
+	  filhosAux[count] = nodoInserimento->filhos[count];
 	  count++;
 	}
 	  
+	count = 0;
+	while(count < nodoInserimento->quantidadeKeys && flag)
+	  if(nodoInserimento->keys[count] > valor) flag = 0;
+	  
+	countAux = 0;
+	  
+	nodoInserimento->quantidadeKeys++;
+	while(countAux < nodoInserimento->quantidadeKeys){
+	  if(countAux == count) nodoInserimento->keys[count] = valor;
+	  else if (countAux >= count) nodoInserimento->keys[countAux] = hashAuxiliar[countAux-1];
+	  countAux++;
+	}
   }
-	
-  nodoInserimento->quantidadeKeys = count =((ordem/2));
-	
-  while(count < ordem){
-	filhoDir->quantidadeKeys++;
-	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-	count++;
-  }
-	
-  pai->quantidadeKeys++;
-  pai->keys[0] = filhoDir->keys[0];
-    
-  filhoDir->pai = pai;
-  nodoInserimento->pai = pai;
-  nodoInserimento->prox = filhoDir;
-	
-  pai->quantidadeFilhos = 2;
-  pai->filhos[0] = nodoInserimento;
-  pai->filhos[1] = filhoDir; 
-	
-  return pai;
+
+  return nodoInserimento;
 }
-
-
 
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
   if(nodoAtual->folha) return nodoAtual;
