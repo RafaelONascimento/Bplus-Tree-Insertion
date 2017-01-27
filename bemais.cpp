@@ -4,9 +4,9 @@
 using namespace std;
 
 /*
-keys minimas = (ordem-1)/2
-filhos minimos = (ordem+1)/2
- */
+  keys minimas = (ordem-1)/2
+  filhos minimos = (ordem+1)/2
+*/
 
 Hash hashFunction(char *str) { //funcao hash vc djb2
   Hash hash = 5381;
@@ -56,8 +56,8 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
 
 nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo){
   Hash valor = leituraLinha(nChar,atributo,linha);
-  Hash j = 210685229342;
-    
+
+  printf("%lld\n",valor);
   
   //Quando a raiz eh null
   if(arvore == NULL){
@@ -108,18 +108,84 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     return pai;
   }
   else{
-	nodo_t *jose = buscaInsercao(arvore,j);
-	int j = 0;
-	
-	while(j < jose->quantidadeKeys){
-	  printf("%lld\n",jose->keys[j]);
-	  j++;
-	}
+	//Italian
+	nodo_t *nodoInserimento = buscaInsercao(arvore,valor);
+
 	return arvore;
   }
   
   return 0;
 }
+
+nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *filho){
+  nodo_t *filhoDir, *pai, *paiAux;
+  int count = 0, flag = 1;
+
+  if(nodoInserimento->quantidadeKeys < ordem-1){
+	nodoInserimento->quantidadeKeys++;
+	nodoInserimento->keys[nodoInserimento->quantidadeKeys-1] = valor;
+	sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+	return nodoInserimento;
+  }
+  else{
+	filhoDir = criaNodo(ordem,true);
+	pai = criaNodo(ordem,false);
+	paiAux = nodoInserimento->pai;
+	
+	nodoInserimento->quantidadeKeys++;
+	nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor;
+	if(nodoInserimento->folha){
+	  sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+	}
+	else{
+	  Hash hashAuxiliar;
+	  nodo_t **filhosAux;
+	  
+	  while(count < nodoInserimento->quantidadeKeys){
+		hashAuxiliar[count] = nodoInserimento->keys[count];
+		count++;
+	  }
+	  
+	  count = 0;
+	  while(count < nodoInserimento->quantidadeFilhos){
+		filhosAux[count] = nodoInserimento->filhos[count];
+		count++;
+	  }
+	  
+	  count = 0;
+	  while(count < nodoInserimento->quantidadeKeys && flag)
+		if(nodoInserimento->keys[count] > valor) flag = 0;
+	  
+	  
+		
+	  count++;
+	}
+	  
+  }
+	
+  nodoInserimento->quantidadeKeys = count =((ordem/2));
+	
+  while(count < ordem){
+	filhoDir->quantidadeKeys++;
+	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+	count++;
+  }
+	
+  pai->quantidadeKeys++;
+  pai->keys[0] = filhoDir->keys[0];
+    
+  filhoDir->pai = pai;
+  nodoInserimento->pai = pai;
+  nodoInserimento->prox = filhoDir;
+	
+  pai->quantidadeFilhos = 2;
+  pai->filhos[0] = nodoInserimento;
+  pai->filhos[1] = filhoDir; 
+	
+  return pai;
+}
+
+
 
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
   if(nodoAtual->folha) return nodoAtual;
@@ -202,8 +268,8 @@ int bulk_loading(nodo_t* &arvore, vind &indices, int ordem){
       if (j && filhoAtual->keys[j-1] == indices[iteradorIndices].hash) { j--; }
       else if (j == condicaoParaFor && indices[iteradorIndices].hash != filhoAtual->keys[j-1]) { break; }
       else {
-	filhoAtual->keys[j] = indices[iteradorIndices].hash;
-	filhoAtual->quantidadeKeys++;
+		filhoAtual->keys[j] = indices[iteradorIndices].hash;
+		filhoAtual->quantidadeKeys++;
       }
         
       //cria novo offset, passando como parametro o offset da hash atual e ligando o novo offset no começo da lista
