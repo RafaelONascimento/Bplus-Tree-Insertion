@@ -66,6 +66,9 @@ nodo_t* criaNodo(int ordem, bool folha);
 //Função que cria e inicializa offset e retorna o ponteiro pro offset. Ela recebe o offset a ser inserido e o antigo offset de um hash, para poder inserir o novo offset no começo da lista, e não no final.
 offsets_t* criaOffset(Offset o, offsets_t *p);
 
+nodo_t* splitInsercao(nodo_t* nodoInserimento,Hash valor, int ordem, nodo_t *filho);
+
+nodo_t* sortMiracolosoInsercione(nodo_t *nodoInserimento, Hash valor, int ordem, nodo_t *filho);
 //Destruir a árvore
 //Função para destruir a arvore (desalocar da memória)
 void mataArvore(nodo_t *n);
