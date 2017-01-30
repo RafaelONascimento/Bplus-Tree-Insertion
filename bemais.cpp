@@ -55,7 +55,7 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
 }
 
 nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo){
- Hash valor = leituraLinha(nChar,atributo,linha);
+  Hash valor = leituraLinha(nChar,atributo,linha);
 
   printf("%lld\n",valor);
   
@@ -77,10 +77,8 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
   }
   //Split na raiz, quando nao tem mais espaco para inserir
   else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha){
-	//Teste de insercao
-	//	pai = splitInsercao(arvore,valor,ordem,NULL);
-
-	nodo_t *filhoDir, *pai;
+    //Teste de insercao
+    nodo_t *filhoDir, *pai;
     int count = 0;
     
     filhoDir = criaNodo(ordem,true);
@@ -107,121 +105,122 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     pai->quantidadeFilhos = 2;
     pai->filhos[0] = arvore;
     pai->filhos[1] = filhoDir; 
-	
+    
     return pai;
   }
   else{
-	//Italian
-	nodo_t *nodoInserimento = buscaInsercao(arvore,valor);
-	
-	
-	return arvore;
+    //Italian
+    nodo_t *nodoInserimento = buscaInsercao(arvore,valor);
+    
+    
+    return arvore;
   }
   
   return 0;
 }
 
-nodo_t* splitInsercao(nodo_t* nodoInserimento,Hash valor, int ordem, nodo_t *filho){
+nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *filho){
   nodo_t *filhoDir, *pai, *paiAux;
   int count = 0, flag = 1;
 
   if(nodoInserimento->quantidadeKeys < ordem-1){
-	nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
-	return nodoInserimento;
+    nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
+    return nodoInserimento;
   }
   else{
-	filhoDir = criaNodo(ordem,true);
-	pai = criaNodo(ordem,false);
-	paiAux = nodoInserimento->pai;
+    filhoDir = criaNodo(ordem,true);
+    pai = criaNodo(ordem,false);
+    paiAux = nodoInserimento->pai;
 	
-	nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
-	
-	//Separa as polentas do nene
-	nodoInserimento->quantidadeKeys = count =((ordem/2));
-	
-	while(count < ordem){
-	  filhoDir->quantidadeKeys++;
-	  filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-	  count++;
-	}
-	
-	pai->quantidadeKeys++;
-	pai->keys[0] = filhoDir->keys[0];
+    nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
     
-	filhoDir->pai = pai;
-	nodoInserimento->pai = pai;
-	nodoInserimento->prox = filhoDir;
-	
-	pai->quantidadeFilhos = 2;
-	pai->filhos[0] = nodoInserimento;
-	pai->filhos[1] = filhoDir; 
-
-	return pai;
+    //Separa as polentas do nene
+    nodoInserimento->quantidadeKeys = count =((ordem/2));
+    
+    while(count < ordem){
+      filhoDir->quantidadeKeys++;
+      filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+      count++;
+    }
+    printf("Teste 1\n");
+    pai->quantidadeKeys++;
+    pai->keys[0] = filhoDir->keys[0];
+      
+    filhoDir->pai = pai;
+    nodoInserimento->pai = pai;
+    nodoInserimento->prox = filhoDir;
+      
+    pai->quantidadeFilhos = 2;
+    pai->filhos[0] = nodoInserimento;
+    pai->filhos[1] = filhoDir; 
+    printf("Teste 2\n");
+    /*   if(pai->pai != NULL)
+	 return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);*/
+    return pai;
   }
 }
 
-nodo_t* sortMiracolosoInsercione(nodo_t *nodoInserimento, Hash valor, int ordem, nodo_t *filho){
+nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem, nodo_t *filho){
   int count = 0 , flag = 1;
   
   if(nodoInserimento->folha){
-	nodoInserimento->quantidadeKeys++;
-	nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor;
-	sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+    nodoInserimento->quantidadeKeys++;
+    nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor;
+    sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
   }
   else{
-	Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
-	nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
-	int countAux = 0, condicaoInsert, condicaoCopy;
+    Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
+    nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
+    int countAux = 0, condicaoInsert, condicaoCopy;
 
-	//Copia as keys para um vetor de hash auxiliar
-	count = 0; 
-	while(count < nodoInserimento->quantidadeKeys){
-	  hashAuxiliar[count] = nodoInserimento->keys[count];
-	  count++;
-	}
+    //Copia as keys para um vetor de hash auxiliar
+    count = 0; 
+    while(count < nodoInserimento->quantidadeKeys){
+      hashAuxiliar[count] = nodoInserimento->keys[count];
+      count++;
+    }
 
-	//Copia os filhos para um vetor de filhos auxiliar
-	count = 0;
-	while(count < nodoInserimento->quantidadeFilhos){
-	  filhosAux[count] = nodoInserimento->filhos[count];
-	  count++;
-	}
+    //Copia os filhos para um vetor de filhos auxiliar
+    count = 0;
+    while(count < nodoInserimento->quantidadeFilhos){
+      filhosAux[count] = nodoInserimento->filhos[count];
+      count++;
+    }
 
-	//Encontra a posicao de insercao do valor na nodo atual
-	count = 0;
-	while(count < nodoInserimento->quantidadeKeys && flag)
-	  if(nodoInserimento->keys[count] > valor) flag = 0;
+    //Encontra a posicao de insercao do valor na nodo atual
+    count = 0;
+    while(count < nodoInserimento->quantidadeKeys && flag)
+      if(nodoInserimento->keys[count] > valor) flag = 0;
 	  
-	//Insere de forma ordena o valor na nodo atual
-	countAux = 0;
+    //Insere de forma ordena o valor na nodo atual
+    countAux = 0;
 
-	nodoInserimento->quantidadeKeys++;
-	while(countAux < nodoInserimento->quantidadeKeys){
-	  if(countAux == count)
-		nodoInserimento->keys[count] = valor;
-	  else if (countAux >= count)
-		nodoInserimento->keys[countAux] = hashAuxiliar[countAux-1];
-	  countAux++;
-	}
+    nodoInserimento->quantidadeKeys++;
+    while(countAux < nodoInserimento->quantidadeKeys){
+      if(countAux == count)
+	nodoInserimento->keys[count] = valor;
+      else if (countAux >= count)
+	nodoInserimento->keys[countAux] = hashAuxiliar[countAux-1];
+      countAux++;
+    }
 
-	//insere o filho de forma ordenada no nodo atual
-	countAux = 0;
-	nodoInserimento->quantidadeFilhos++;
+    //insere o filho de forma ordenada no nodo atual
+    countAux = 0;
+    nodoInserimento->quantidadeFilhos++;
 
-	condicaoInsert = (count != 0);
-	condicaoCopy = (count == 0);
+    condicaoInsert = (count != 0);
+    condicaoCopy = (count == 0);
 
-	while(countAux < nodoInserimento->quantidadeFilhos){
-	  //PorcaMadona
-	  if(countAux == (count+condicaoInsert))
-		nodoInserimento->filhos[countAux] = filho;
-	  else if(countAux > (count+(condicaoInsert)))
-		nodoInserimento->filhos[countAux-(condicaoCopy)] = filhosAux[countAux];
-	  countAux++;
-	}
-	
-	return nodoInserimento;
+    while(countAux < nodoInserimento->quantidadeFilhos){
+      //PorcaMadona
+      if(countAux == (count+condicaoInsert))
+	nodoInserimento->filhos[countAux] = filho;
+      else if(countAux > (count+(condicaoInsert)))
+	nodoInserimento->filhos[countAux-(condicaoCopy)] = filhosAux[countAux];
+      countAux++;
+    }
   }
+  return nodoInserimento;
 }
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
   if(nodoAtual->folha) return nodoAtual;
@@ -304,8 +303,8 @@ int bulk_loading(nodo_t* &arvore, vind &indices, int ordem){
       if (j && filhoAtual->keys[j-1] == indices[iteradorIndices].hash) { j--; }
       else if (j == condicaoParaFor && indices[iteradorIndices].hash != filhoAtual->keys[j-1]) { break; }
       else {
-		filhoAtual->keys[j] = indices[iteradorIndices].hash;
-		filhoAtual->quantidadeKeys++;
+	filhoAtual->keys[j] = indices[iteradorIndices].hash;
+	filhoAtual->quantidadeKeys++;
       }
         
       //cria novo offset, passando como parametro o offset da hash atual e ligando o novo offset no começo da lista
@@ -536,7 +535,7 @@ void imprimeTupla(nodo_t *nodoAtual, int indiceElemento, FILE *arquivo) {
   }
 }
 
-void imprimeMenu() {
+void imprimeMenu(){
   printf("Digite a opção desejada\n");
   printf("0• Sair\n");
   printf("1• Imprimir a árvore\n");
