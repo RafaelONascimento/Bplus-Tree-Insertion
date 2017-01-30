@@ -77,36 +77,7 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
   }
   //Split na raiz, quando nao tem mais espaco para inserir
   else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha){
-    //Teste de insercao
-    nodo_t *filhoDir, *pai;
-    int count = 0;
-    
-    filhoDir = criaNodo(ordem,true);
-    pai = criaNodo(ordem,false);
-
-    arvore->quantidadeKeys++;
-    arvore->keys[(arvore->quantidadeKeys)-1] = valor;
-    sort(arvore->keys,(arvore->keys+arvore->quantidadeKeys));
-    arvore->quantidadeKeys = count =((ordem/2));
-       
-    while(count < ordem){
-      filhoDir->quantidadeKeys++;
-      filhoDir->keys[(filhoDir->quantidadeKeys)-1] = arvore->keys[count];
-      count++;
-    }
-
-    pai->quantidadeKeys++;
-    pai->keys[0] = filhoDir->keys[0];
-    
-    filhoDir->pai = pai;
-    arvore->pai = pai;
-    arvore->prox = filhoDir;
-
-    pai->quantidadeFilhos = 2;
-    pai->filhos[0] = arvore;
-    pai->filhos[1] = filhoDir; 
-    
-    return pai;
+   return splitInsercao(arvore, valor,ordem,NULL);
   }
   else{
     //Italian
@@ -136,13 +107,13 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
     
     //Separa as polentas do nene
     nodoInserimento->quantidadeKeys = count =((ordem/2));
-    
+
     while(count < ordem){
       filhoDir->quantidadeKeys++;
       filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
       count++;
     }
-    printf("Teste 1\n");
+
     pai->quantidadeKeys++;
     pai->keys[0] = filhoDir->keys[0];
       
@@ -153,9 +124,9 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
     pai->quantidadeFilhos = 2;
     pai->filhos[0] = nodoInserimento;
     pai->filhos[1] = filhoDir; 
-    printf("Teste 2\n");
-    /*   if(pai->pai != NULL)
-	 return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);*/
+      
+    if(pai->pai != NULL)
+      return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
     return pai;
   }
 }
