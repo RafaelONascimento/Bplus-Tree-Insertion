@@ -53,7 +53,7 @@ Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]);
 //Função que le o arquivo .csv e guarda as hashs e os offsets no vector de index_t
 void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada);
 //Faz a insercao de um unico elemento na arvor
-nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo);
+nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo);
 //Busca do nodo para o algoritimo de insercao de elementos separados
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor);
 //BulkLoading

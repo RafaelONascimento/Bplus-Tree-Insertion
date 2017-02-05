@@ -54,8 +54,8 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
   sort(indices.begin(), indices.end(), compareIndex);
 }
 
-nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo){
-  Hash valor = leituraLinha(nChar,atributo,linha);
+nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo){
+  //  Hash valor = /*leituraLinha(nChar,atributo,linha)*/;
 
   printf("%lld\n",valor);
   
@@ -81,6 +81,7 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
   }
   else{
     nodo_t* nodoInserimento = buscaInsercao(arvore, valor);
+	printf("->>>>>>>>%llu %llu\n",nodoInserimento->keys[0],valor);
     return splitInsercao(nodoInserimento, valor,ordem,NULL);
   }
   
@@ -100,9 +101,9 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
     if(nodoInserimento->pai != NULL){
       paiAux = nodoInserimento;
       while(paiAux->pai != NULL){
-	paiAux = paiAux->pai;
+		paiAux = paiAux->pai;
       }
-       printf("aaaaaaaa11111111\n");
+	  printf("aaaaaaaa11111111\n");
       return paiAux;
     }
     else{
@@ -126,9 +127,9 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       nodoInserimento->quantidadeKeys = count = ordem/2;
      
       while(count < ordem){
-	filhoDir->quantidadeKeys++;
-	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-	count++;
+		filhoDir->quantidadeKeys++;
+		filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+		count++;
       }
       
       printf("aqui mesmo\n");     
@@ -136,9 +137,9 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       count = ordem/2;
   
       while(!nodoInserimento->folha && count < ordem){
-	filhoDir->quantidadeFilhos++;
-	filhoDir->filhos[(filhoDir->quantidadeKeys)-1] = nodoInserimento->filhos[contadore];
-	count++;
+		filhoDir->quantidadeFilhos++;
+		filhoDir->filhos[(filhoDir->quantidadeKeys)-1] = nodoInserimento->filhos[contadore];
+		count++;
       }
       printf("aqui mesmo 2\n");    
     
@@ -155,8 +156,8 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       pai->filhos[1] = filhoDir;
 
       if(pai->pai != NULL){
-	printf("aaaaaaa22222222222222222(%llu)\n",pai->pai->keys[0]);
-	return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
+		printf("aaaaaaa22222222222222222(%llu)\n",pai->pai->keys[0]);
+		return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
       }
       else{ printf("bbbbbbbb22222222222222222\n"); return pai;}
     }
@@ -181,9 +182,9 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       count++;
       
       while(count < ordem){
-	filhoDir->quantidadeKeys++;
-	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-	count++;
+		filhoDir->quantidadeKeys++;
+		filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+		count++;
       }
       
       printf("aqui mesmo\n");     
@@ -191,20 +192,20 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       count = (ordem/2)+1;
       
       while(count <= ordem){
-	printf("%d\n",count);
-	filhoDir->quantidadeFilhos++;
-	filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count];
-	count++;
+		printf("%d\n",count);
+		filhoDir->quantidadeFilhos++;
+		filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count];
+		count++;
       }
       printf("aqui mesmo 2\n");    
    
       if(pai->pai != NULL){
-	printf("aaaaaaa44444444444444444444(%llu)\n",pai->pai->keys[0]);
-	return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
+		printf("aaaaaaa44444444444444444444(%llu)\n",pai->pai->keys[0]);
+		return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
       }
       else{
-	printf("bbbbbbbb44444444444\n");
-	return pai;
+		printf("bbbbbbbb44444444444\n");
+		return pai;
       }
     }
   }
@@ -254,9 +255,9 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem
     while(contadoreAux < nodoInserimento->quantidadeKeys){
       printf("ww4\n");
       if(contadoreAux == contadore)
-	nodoInserimento->keys[contadore] = valor;
+		nodoInserimento->keys[contadore] = valor;
       else if (contadoreAux >= contadore)
-	nodoInserimento->keys[contadoreAux] = hashAuxiliar[contadoreAux-1];
+		nodoInserimento->keys[contadoreAux] = hashAuxiliar[contadoreAux-1];
       contadoreAux++;
     }
 
@@ -271,9 +272,9 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem
       printf("ww5\n");
       //PorcaMadona
       if(contadoreAux == (contadore+condicaoInsert))
-	nodoInserimento->filhos[contadoreAux] = filho;
+		nodoInserimento->filhos[contadoreAux] = filho;
       else if(contadoreAux > (contadore+(condicaoInsert)))
-	nodoInserimento->filhos[contadoreAux-(condicaoCopy)] = filhosAux[contadoreAux];
+		nodoInserimento->filhos[contadoreAux-(condicaoCopy)] = filhosAux[contadoreAux];
       contadoreAux++;
     }
     printf("QUITw5\n");
@@ -359,8 +360,8 @@ int bulk_loading(nodo_t* &arvore, vind &indices, int ordem){
       if (j && filhoAtual->keys[j-1] == indices[iteradorIndices].hash) { j--; }
       else if (j == condicaoParaFor && indices[iteradorIndices].hash != filhoAtual->keys[j-1]) { break; }
       else {
-	filhoAtual->keys[j] = indices[iteradorIndices].hash;
-	filhoAtual->quantidadeKeys++;
+		filhoAtual->keys[j] = indices[iteradorIndices].hash;
+		filhoAtual->quantidadeKeys++;
       }
         
       //cria novo offset, passando como parametro o offset da hash atual e ligando o novo offset no começo da lista
@@ -514,11 +515,11 @@ int imprimeArvore(nodo_t *arvore) {
 void imprimeNodos(FILE *dotFile, nodo_t *n, int *numeroNodo, int liga) {
   int esseNumero = *numeroNodo;
   if (!n) return;
-  printf("%d [label=%d];\n", (*numeroNodo)++, liga);
+  //printf("%d [label=%d];\n", (*numeroNodo)++, liga);
   fprintf(dotFile, "%d [label=%d];\n", (*numeroNodo)++, liga);
   // printf("%d [label=%d];\n", (*numeroNodo), liga);
   for (int i = 0; i < n->quantidadeFilhos; i++) {
-    printf("%d\n",esseNumero);
+	// printf("%d\n",esseNumero);
     
     fprintf(dotFile, "%d -- ", esseNumero);
     (*numeroNodo)++;
@@ -528,7 +529,7 @@ void imprimeNodos(FILE *dotFile, nodo_t *n, int *numeroNodo, int liga) {
   //imprime esse nodo
   fprintf(dotFile, "%d [label=\"", esseNumero);
   for (int i = 0; i < n->quantidadeKeys; i++){
-    printf("%d %llu\n",(n->folha)?1:0,n->keys[i]);
+    //printf("%d %llu\n",(n->folha)?1:0,n->keys[i]);
     fprintf(dotFile, "%s %lld", i? " »":"", n->keys[i]);
   }
   fprintf(dotFile, "\"];\n");
