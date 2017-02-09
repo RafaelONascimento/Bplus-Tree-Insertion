@@ -61,11 +61,10 @@ int main(int argc, char *argv[]) {
       break;
     case 3:
       printf("Digite o dado a ser inserido:\n");
-	  Hash a;
+      Hash a;
       //fgets(linha, MAXLINHA,stdin);
-	  scanf("%llu",&a);
-      arvore = insercaoElemento(arvore,a,ordem,nChar,atributo);
-      // printf("%lli\n",leituraLinha(nChar,atributo,linha));
+      scanf("%llu",&a);
+      arvore = insercaoElemento(arvore,a/*linha*/,ordem,nChar,atributo);
     } 
   }  
   mataArvore(arvore);

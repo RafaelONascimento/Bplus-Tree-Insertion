@@ -3,11 +3,6 @@
 #include "bemais.h"
 using namespace std;
 
-/*
-  keys minimas = (ordem-1)/2
-  filhos minimos = (ordem+1)/2
-*/
-
 Hash hashFunction(char *str) { //funcao hash vc djb2
   Hash hash = 5381;
   int c;
@@ -55,10 +50,9 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
 }
 
 nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo){
-  //  Hash valor = /*leituraLinha(nChar,atributo,linha)*/;
-
-  printf("%lld\n",valor);
-  
+  int aux = 0, flag = 0;
+  // Hash valor = leituraLinha(nChar,atributo,linha);
+  index_t valoreInserimento(valor,0);
   //Quando a raiz eh null
   if(arvore == NULL){
     arvore = criaNodo(ordem, true);
@@ -68,33 +62,34 @@ nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, in
   }
   //Quando tem espaco para inserir na raiz
   else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1 && arvore->folha){
-    //TODO
-    //arrumar ordenacao dos offsets
     arvore->quantidadeKeys++;
     arvore->keys[(arvore->quantidadeKeys)-1] = valor;
     sort(arvore->keys,(arvore->keys+arvore->quantidadeKeys));
     return arvore;
   }
   //Split na raiz, quando nao tem mais espaco para inserir
-  else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha){
-    return splitInsercao(arvore, valor,ordem,NULL);
-  }
+  else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha)
+    return splitInsercao(arvore, valoreInserimento,ordem,NULL);
   else{
+    index_t valoreInserimento(valor,0);
     nodo_t* nodoInserimento = buscaInsercao(arvore, valor);
-	printf("->>>>>>>>%llu %llu(%llu)\n",nodoInserimento->keys[0],valor,nodoInserimento->pai->keys[0]);
-    return splitInsercao(nodoInserimento, valor,ordem,NULL);
+
+    while(aux < nodoInserimento->quantidadeKeys && !flag){
+      if(nodoInserimento->keys[aux] == valor) flag = 1;
+      else if(nodoInserimento->keys[aux] > valor) flag = 2;
+      aux++;
+    }
+    if(flag == 1) return arvore;
+    else return splitInsercao(nodoInserimento,valoreInserimento,ordem,NULL);   
   }
-  
-  return 0;
 }
 
-nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *filho){
+nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho){
   nodo_t *filhoDir, *pai, *paiAux;
   int contadore = 0, flag = 1, count = 0;
 
   if(nodoInserimento->quantidadeKeys < ordem-1){
     nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
-	printf("fdnafhbaf\n");
     if(nodoInserimento->pai != NULL){
       paiAux = nodoInserimento;
       while(paiAux->pai != NULL) paiAux = paiAux->pai;
@@ -109,13 +104,13 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
  	
       nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
       pai->pai = nodoInserimento->pai;
-	  //Separa as polentas do nene, e verifica se o nene esta com fome ou nao
+      //Separa as polentas do nene, e verifica se o nene esta com fome ou nao
       nodoInserimento->quantidadeKeys = count = ordem/2;
      
       while(count < ordem){
-		filhoDir->quantidadeKeys++;
-		filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-		count++;
+	filhoDir->quantidadeKeys++;
+	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+	count++;
       }
          
       pai->quantidadeKeys++;
@@ -128,11 +123,10 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       pai->filhos[1] = filhoDir;
 
       if(pai->pai != NULL){
-		printf("%llu === %llu === %llu === %llu == %llu\n",pai->quantidadeFilhos, pai->quantidadeKeys,pai->keys[0],nodoInserimento->keys[0],filhoDir->keys[0]);
-		
-		printf("423943821490\n");
-		return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
-	  }
+	valor.hash = pai->keys[0];
+	return splitInsercao(pai->pai,valor,ordem,pai->filhos[1]);
+
+      }
       else return pai;
     }
     else{
@@ -154,37 +148,35 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *fi
       count++;
       
       while(count < ordem){
-		filhoDir->quantidadeKeys++;
-		filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
-		count++;
+	filhoDir->quantidadeKeys++;
+	filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
+	count++;
       }
       
       count = (ordem/2)+1;
       
       while(count <= ordem){
-		printf("%d\n",count);
-		filhoDir->quantidadeFilhos++;
-		filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count];
-		filhoDir->filhos[(filhoDir->quantidadeFilhos)-1]->pai = filhoDir;
-		//		printf("=====%llu %llu--%llu\n",filhoDir->filhos[(filhoDir->quantidadeKeys)-1]->keys[0],filhoDir->keys[0],filhoDir->pai->keys[0]);/* = filhoDir->pai;*/
-		count++;
+	filhoDir->quantidadeFilhos++;
+	filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count];
+	filhoDir->filhos[(filhoDir->quantidadeFilhos)-1]->pai = filhoDir;
+	count++;
       }
       
       if(pai->pai != NULL){
-		printf("dsaffdffsd\n");
-		return splitInsercao(pai->pai,pai->keys[0],ordem,pai->filhos[1]);
-	  }
+	valor.hash = pai->keys[0];
+	return splitInsercao(pai->pai,valor,ordem,pai->filhos[1]);
+      }
       else return pai;
     }
   }
 }
 
-nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem, nodo_t *filho){
+nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ordem, nodo_t *filho){
   int contadore = 0 , flag = 1;
   
   if(nodoInserimento->folha){
     nodoInserimento->quantidadeKeys++;
-    nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor;
+    nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor.hash;
     sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
   }
   else{
@@ -198,7 +190,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem
       hashAuxiliar[contadore] = nodoInserimento->keys[contadore];
       contadore++;
     }
-
+    
     //Copia os filhos para um vetor de filhos auxiliar
     contadore = 0;
     while(contadore < nodoInserimento->quantidadeFilhos){
@@ -206,47 +198,32 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem
       contadore++;
     }
 
-	
     //Encontra a posicao de insercao do valor na nodo atual
     contadore = 0;
     while(contadore < nodoInserimento->quantidadeKeys &&  flag){
-      if(nodoInserimento->keys[contadore] > valor) flag = 0;
-	  else contadore++;
+      if(nodoInserimento->keys[contadore] > valor.hash) flag = 0;
+      else contadore++;
     }
     //Insere de forma ordena o valor na nodo atual
     contadoreAux = 0;
 
     nodoInserimento->quantidadeKeys++;
     while(contadoreAux < nodoInserimento->quantidadeKeys){
-      if(contadoreAux == contadore) nodoInserimento->keys[contadore] = valor;
+      if(contadoreAux == contadore) nodoInserimento->keys[contadore] = valor.hash;
       else if (contadoreAux >= contadore) nodoInserimento->keys[contadoreAux] = hashAuxiliar[contadoreAux-1];
       contadoreAux++;
     }
-	//insere o filho de forma ordenada no nodo atual
-	/*  contadoreAux = contadore;*/
-	nodoInserimento->quantidadeFilhos++;
-	printf("%d\n",contadore);
-	printf("23456789*%llu %llu\n",valor,filho->keys[0]);
-	/*if(valor == filho->keys[0]){
-	  //  contadore++;
-	  printf("sdafaasdafsdf\n");
-	  contadoreAux = 0;
-	  while(contadoreAux < nodoInserimento->quantidadeFilhos){
-		if(contadoreAux == contadore) nodoInserimento->filhos[contadoreAux] = filho;
-		else if(contadoreAux > contadore)
-		  nodoInserimento->filhos[contadoreAux] = filhosAux[contadoreAux-1];
-		contadoreAux++;
-	  }
-	}
-	else*/ nodoInserimento->filhos[nodoInserimento->quantidadeFilhos-1] = filho;
-	  
-	
-	/*
-	while(contadoreAux < nodoInserimento->quantidadeFilhos){
-	  if(contadoreAux == (contadore+condicaoInsert)) nodoInserimento->filhos[contadoreAux] = filho;
-	  else if(contadoreAux > (contadore+(condicaoInsert))) nodoInserimento->filhos[contadoreAux-(condicaoCopy)] = filhosAux[contadoreAux];
-	  contadoreAux++;
-	  }*/
+    //insere o filho de forma ordenada no nodo atual
+    nodoInserimento->quantidadeFilhos++;
+ 
+    contadoreAux = 0;
+    while(contadoreAux < nodoInserimento->quantidadeFilhos){
+      if(contadoreAux == (contadore+1))
+	nodoInserimento->filhos[contadoreAux] = filho;
+      else if(contadoreAux > (contadore+1))
+	nodoInserimento->filhos[contadoreAux] = filhosAux[contadoreAux-1];
+      contadoreAux++;
+    }
   }
   return nodoInserimento;
 }
@@ -256,7 +233,7 @@ nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
   int contadore = 0, flag = 0;
   
   while(contadore < nodoAtual->quantidadeKeys && !flag){
-    if(nodoAtual->keys[contadore] >= valor) flag = 1;
+    if(nodoAtual->keys[contadore] > valor) flag = 1;
     else contadore++; 
   }
   
@@ -329,8 +306,8 @@ int bulk_loading(nodo_t* &arvore, vind &indices, int ordem){
       if (j && filhoAtual->keys[j-1] == indices[iteradorIndices].hash) { j--; }
       else if (j == condicaoParaFor && indices[iteradorIndices].hash != filhoAtual->keys[j-1]) { break; }
       else {
-		filhoAtual->keys[j] = indices[iteradorIndices].hash;
-		filhoAtual->quantidadeKeys++;
+	filhoAtual->keys[j] = indices[iteradorIndices].hash;
+	filhoAtual->quantidadeKeys++;
       }
         
       //cria novo offset, passando como parametro o offset da hash atual e ligando o novo offset no começo da lista
@@ -484,13 +461,8 @@ int imprimeArvore(nodo_t *arvore) {
 void imprimeNodos(FILE *dotFile, nodo_t *n, int *numeroNodo, int liga) {
   int esseNumero = *numeroNodo;
   if (!n) return;
-  printf("%llu %llu\n",n->keys[0],(n->pai != NULL)? n->pai->keys[0] : 0);
-  //printf("%d [label=%d];\n", (*numeroNodo)++, liga);
   fprintf(dotFile, "%d [label=%d];\n", (*numeroNodo)++, liga);
-  // printf("%d [label=%d];\n", (*numeroNodo), liga);
-  for (int i = 0; i < n->quantidadeFilhos; i++) {
-	// printf("%d\n",esseNumero);
-    
+  for (int i = 0; i < n->quantidadeFilhos; i++) {   
     fprintf(dotFile, "%d -- ", esseNumero);
     (*numeroNodo)++;
     imprimeNodos(dotFile, n->filhos[i], numeroNodo, i);

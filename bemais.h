@@ -16,7 +16,7 @@ typedef struct index_t{
     Hash hash;
     long long int offset;
 
-    index_t(long long int _h, unsigned long int _o) : hash(_h), offset(_o) {}
+index_t(long long int _h, unsigned long int _o) : hash(_h), offset(_o) {}
 } index_t;
 
 //offsets. O prox e pra quando se tem mais de um hash igual
@@ -31,11 +31,6 @@ typedef struct nodo_t{
     Hash *keys;
     int quantidadeKeys, quantidadeFilhos;
     bool folha;
-
-    /*~nodo_t() { //deconstrutor
-        free(keys);
-        free(filhos);
-    }*/
 }nodo_t;
 
 typedef vector<index_t> vind;
@@ -55,6 +50,8 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada);
 //Faz a insercao de um unico elemento na arvor
 nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo);
 //Busca do nodo para o algoritimo de insercao de elementos separados
+nodo_t* splitInsercao(nodo_t* &nodoInserimento,index_t valor, int ordem, nodo_t *filho);
+nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho);
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor);
 //BulkLoading
 //Função principal do Bulk Loading. Retorna se nenhum erro aconteceu.
@@ -65,10 +62,6 @@ int checaPai(nodo_t *filhoAtual, nodo_t** pAtual, Hash hashQueVem, int ordem);
 nodo_t* criaNodo(int ordem, bool folha);
 //Função que cria e inicializa offset e retorna o ponteiro pro offset. Ela recebe o offset a ser inserido e o antigo offset de um hash, para poder inserir o novo offset no começo da lista, e não no final.
 offsets_t* criaOffset(Offset o, offsets_t *p);
-
-nodo_t* splitInsercao(nodo_t* &nodoInserimento,Hash valor, int ordem, nodo_t *filho);
-
-nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, Hash valor, int ordem, nodo_t *filho);
 //Destruir a árvore
 //Função para destruir a arvore (desalocar da memória)
 void mataArvore(nodo_t *n);
