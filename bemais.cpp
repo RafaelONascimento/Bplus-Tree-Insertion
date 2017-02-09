@@ -61,17 +61,16 @@ nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, in
     return arvore;
   }
   //Quando tem espaco para inserir na raiz
-  else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1 && arvore->folha){
-    arvore->quantidadeKeys++;
+  /* else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1 && arvore->folha){
+     arvore->quantidadeKeys++;
     arvore->keys[(arvore->quantidadeKeys)-1] = valor;
     sort(arvore->keys,(arvore->keys+arvore->quantidadeKeys));
     return arvore;
-  }
+    }
   //Split na raiz, quando nao tem mais espaco para inserir
   else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha)
-    return splitInsercao(arvore, valoreInserimento,ordem,NULL);
+  return splitInsercao(arvore, valoreInserimento,ordem,NULL);*/
   else{
-    index_t valoreInserimento(valor,0);
     nodo_t* nodoInserimento = buscaInsercao(arvore, valor);
 
     while(aux < nodoInserimento->quantidadeKeys && !flag){
