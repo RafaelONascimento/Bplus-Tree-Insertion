@@ -53,33 +53,18 @@ nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, in
   int aux = 0, flag = 0;
   // Hash valor = leituraLinha(nChar,atributo,linha);
   index_t valoreInserimento(valor,0);
-  //Quando a raiz eh null
-  if(arvore == NULL){
-    arvore = criaNodo(ordem, true);
-    arvore->quantidadeKeys = 1;
-    arvore->keys[0] = valor;
-    return arvore;
+  nodo_t* nodoInserimento;
+  
+  if(arvore == NULL)  nodoInserimento = criaNodo(ordem, true);
+  else nodoInserimento = buscaInsercao(arvore, valor);
+  
+  while(aux < nodoInserimento->quantidadeKeys && !flag && !arvore->folha){
+    if(nodoInserimento->keys[aux] == valor) flag = 1;
+    else if(nodoInserimento->keys[aux++] > valor) flag = 2;
   }
-  //Quando tem espaco para inserir na raiz
-  /* else if((arvore->pai == NULL) && arvore->quantidadeKeys < ordem-1 && arvore->folha){
-     arvore->quantidadeKeys++;
-    arvore->keys[(arvore->quantidadeKeys)-1] = valor;
-    sort(arvore->keys,(arvore->keys+arvore->quantidadeKeys));
-    return arvore;
-    }
-  //Split na raiz, quando nao tem mais espaco para inserir
-  else if((arvore->pai == NULL) && arvore->quantidadeKeys >= ordem-1 && arvore->folha)
-  return splitInsercao(arvore, valoreInserimento,ordem,NULL);*/
-  else{
-    nodo_t* nodoInserimento = buscaInsercao(arvore, valor);
-
-    while(aux < nodoInserimento->quantidadeKeys && !flag){
-      if(nodoInserimento->keys[aux] == valor) flag = 1;
-      else if(nodoInserimento->keys[aux++] > valor) flag = 2;
-    }
-    if(flag == 1) return arvore;
-    else return splitInsercao(nodoInserimento,valoreInserimento,ordem,NULL);   
-  }
+  
+  if(flag == 1) return arvore;
+  else return splitInsercao(nodoInserimento,valoreInserimento,ordem,NULL);   
 }
 
 nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho){
@@ -149,24 +134,17 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
   }
   else{
     Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
-    // offsets_t **offsetAuxiliar = (offsets_t**)malloc(sizeof(offsets_t*)*(ordem-1));
     nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
-    int contadoreAux = 0, condicaoInsert, condicaoCopy;
-
+    int contadoreAux = 0;
+    
     //Copia as keys para um vetor de hash auxiliar
     contadore = 0; 
     while(contadore < nodoInserimento->quantidadeKeys){
-      printf("%dfghjl;'\n");
       hashAuxiliar[contadore] = nodoInserimento->keys[contadore];
-      //   offsetAuxiliar[contadore] = nodoInserimento->offsets[contadore];
-      contadore++;
-    }
-    printf("frcmc%dfghjl;'\n");
-    //Copia os filhos para um vetor de filhos auxiliar
-    contadore = 0;
-    while(contadore < nodoInserimento->quantidadeFilhos)
       filhosAux[contadore] = nodoInserimento->filhos[contadore++];
-
+    }
+    filhosAux[contadore] = nodoInserimento->filhos[contadore];
+    
     //Encontra a posicao de insercao do valor na nodo atual
     contadore = 0;
     while(contadore < nodoInserimento->quantidadeKeys &&  flag){
@@ -175,23 +153,17 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
     }
     //Insere de forma ordena o valor na nodo atual
     contadoreAux = 0;
-
     nodoInserimento->quantidadeKeys++;
     while(contadoreAux < nodoInserimento->quantidadeKeys){
-      if(contadoreAux == contadore){
+      if(contadoreAux == contadore)
 	nodoInserimento->keys[contadore] = valor.hash;
-	//	nodoInserimento->offsets[contadore]->offset = valor.offset;
-      }
-      else if (contadoreAux >= contadore){
+      else if (contadoreAux >= contadore)
 	nodoInserimento->keys[contadoreAux] = hashAuxiliar[contadoreAux-1];
-	/*	nodoInserimento->offsets[contadoreAux]->offset = offsetAuxiliar[contadoreAux-1]->offset;
-		nodoInserimento->offsets[contadoreAux]->prox = offsetAuxiliar[contadoreAux-1]->prox;*/
-      }
       contadoreAux++;
     }
+    
     //insere o filho de forma ordenada no nodo atual
-    nodoInserimento->quantidadeFilhos++;
- 
+    nodoInserimento->quantidadeFilhos++; 
     contadoreAux = 0;
     while(contadoreAux < nodoInserimento->quantidadeFilhos){
       if(contadoreAux == (contadore+1))
