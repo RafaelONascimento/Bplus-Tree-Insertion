@@ -53,17 +53,33 @@ nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, in
   int aux = 0, flag = 0;
   // Hash valor = leituraLinha(nChar,atributo,linha);
   index_t valoreInserimento(valor,0);
+  offsets_t *offsetAux;
   nodo_t* nodoInserimento;
-  
+
+  //Caso a arvore esteja vazia eh feita a alocao do primeiro nodo
   if(arvore == NULL)  nodoInserimento = criaNodo(ordem, true);
+  //Se a arvore nao estiver vazia, e feito a busca pelo nodo a ser inserido o valor
   else nodoInserimento = buscaInsercao(arvore, valor);
-  
+
+  //Apos a busca verifica se o valor jah esta inserido no nodo folha
   while(aux < nodoInserimento->quantidadeKeys && !flag && !arvore->folha){
     if(nodoInserimento->keys[aux] == valor) flag = 1;
     else if(nodoInserimento->keys[aux++] > valor) flag = 2;
   }
-  
-  if(flag == 1) return arvore;
+
+  //Se o valor jah estiver na folha, soh eh inserido o offset na lista de offsets
+  if(flag == 1){
+    offsetAux = nodoInserimento->offsets[aux];
+    //procura o ultimo offset
+    while(offsetAux->prox != NULL)
+      offsetAux = offsetAux->prox;
+    //adiciona o novo offset no prox do ultimo offset
+    offsetAux->prox = criaOffset(valoreInserimento.offset,NULL);
+
+    //returna a propria avore
+    return arvore;
+  }
+  //Caso o valor nao estiver inserido ainda, eh chamado a funcao de split
   else return splitInsercao(nodoInserimento,valoreInserimento,ordem,NULL);   
 }
 
@@ -71,19 +87,27 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
   nodo_t *filhoDir, *pai, *paiAux;
   int contadore = 0, flag = 1, count = 0;
 
+  //Caso haja espaco eh apenas inserido e ordenado 
   if(nodoInserimento->quantidadeKeys < ordem-1){
+    //Eh chamado a funcao de insercao ordenada no nodo
     nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
+    //Faz a verificacao para encontra a raiz da arvore
     if(nodoInserimento->pai != NULL){
       paiAux = nodoInserimento;
-      while(paiAux->pai != NULL) paiAux = paiAux->pai;
+      while(paiAux->pai != NULL)
+        paiAux = paiAux->pai;
       return paiAux;
     }
     else return nodoInserimento;
   }
-  else{ 
+  //Caso nao haja espaco eh iniciado os casos de split
+  else{
+    //Cria nodo filho a direira
     filhoDir = criaNodo(ordem,nodoInserimento->folha);
+    //Cria nodo que seja o novo pai;
     pai = criaNodo(ordem,false);
-      
+
+    //chama a funcao de insercao ordenada no nodo atual
     nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
     count = (ordem/2);
     pai->quantidadeKeys++;
@@ -97,14 +121,16 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
 
     if(!nodoInserimento->folha)
       nodoInserimento->quantidadeFilhos = (++count);
-      
+
+    //copia as keys para o filho da direta 
     while(count < ordem){
       filhoDir->quantidadeKeys++;
       filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count++];
     }
-      
+    
     count = (ordem/2)+1;
-      
+
+    //copia os filhos para o filho da direita
     while(!nodoInserimento->folha && count <= ordem){
       filhoDir->quantidadeFilhos++;
       filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count++];
@@ -116,6 +142,7 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
       nodoInserimento->prox = filhoDir;     
     }
     
+    //Verifica se o nodo ao qual foi feito split tinha pai, se sim eh chamado a recursao para ele. caso nao tenha, eh apenas retornado o pai
     if(pai->pai != NULL){
       valor.hash = pai->keys[0];
       return splitInsercao(pai->pai,valor,ordem,pai->filhos[1]);
@@ -125,54 +152,71 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
 }
 
 nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ordem, nodo_t *filho){
-  int contadore = 0 , flag = 1;
+  int contadore = 0 , flag = 1 , posicione = 0;
+  Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
+  offsets_t **offsetAux = (offsets_t**)malloc(sizeof(offsets_t*)*(ordem-1));
+  nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
   
-  if(nodoInserimento->folha){
-    nodoInserimento->quantidadeKeys++;
-    nodoInserimento->keys[(nodoInserimento->quantidadeKeys)-1] = valor.hash;
-    sort(nodoInserimento->keys,(nodoInserimento->keys+nodoInserimento->quantidadeKeys));
+  //Encontra a posicao de insercao do valor na nodo atual
+  while(posicione < nodoInserimento->quantidadeKeys &&  flag){
+    if(nodoInserimento->keys[posicione] > valor.hash) flag = 0;
+    else posicione++;
   }
-  else{
-    Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
-    nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
-    int contadoreAux = 0;
-    
-    //Copia as keys para um vetor de hash auxiliar
-    contadore = 0; 
-    while(contadore < nodoInserimento->quantidadeKeys){
-      hashAuxiliar[contadore] = nodoInserimento->keys[contadore];
-      filhosAux[contadore] = nodoInserimento->filhos[contadore++];
+  
+  //Copia as keys para um vetor de hash auxiliar
+  while(contadore < nodoInserimento->quantidadeKeys){
+    hashAuxiliar[contadore] = nodoInserimento->keys[contadore];
+    contadore++;
+  }  
+
+  //Copia offsets para vetor auxiliar de offsets
+  contadore = 0;
+  while(nodoInserimento->folha && contadore < nodoInserimento->quantidadeKeys){
+    offsetAux[contadore] = nodoInserimento->offsets[contadore];
+    contadore++;
+  }
+  
+  //Insere de forma ordena o valor e offset na nodo atual
+  contadore = 0;
+  nodoInserimento->quantidadeKeys++;
+  while(contadore < nodoInserimento->quantidadeKeys){
+    if(contadore == posicione){
+      //Copia o valor na posicao desejada
+      nodoInserimento->keys[contadore] = valor.hash;
+      //copia o offset na posicao desejada
+      if(nodoInserimento->folha)
+        nodoInserimento->offsets[contadore] = criaOffset(valor.offset,NULL);
     }
-    filhosAux[contadore] = nodoInserimento->filhos[contadore];
-    
-    //Encontra a posicao de insercao do valor na nodo atual
+    else if (contadore >= posicione){
+      //copia o valor do vetor auxiliar para a posicao correta/ordenada
+      nodoInserimento->keys[contadore] = hashAuxiliar[contadore-1];
+      //copia o offset do vetor auxiliar para a posicao correta/ordenada
+      if(nodoInserimento->folha)
+        nodoInserimento->offsets[contadore] = offsetAux[contadore-1];
+    }
+    contadore++;
+  }
+  
+  if(!nodoInserimento->folha){
+    //Copia os filhos para um vetor de filhos auxiliar
     contadore = 0;
-    while(contadore < nodoInserimento->quantidadeKeys &&  flag){
-      if(nodoInserimento->keys[contadore] > valor.hash) flag = 0;
-      else contadore++;
+    while(contadore < nodoInserimento->quantidadeFilhos ){
+      filhosAux[contadore] = nodoInserimento->filhos[contadore];
+      contadore++;
     }
-    //Insere de forma ordena o valor na nodo atual
-    contadoreAux = 0;
-    nodoInserimento->quantidadeKeys++;
-    while(contadoreAux < nodoInserimento->quantidadeKeys){
-      if(contadoreAux == contadore)
-	nodoInserimento->keys[contadore] = valor.hash;
-      else if (contadoreAux >= contadore)
-	nodoInserimento->keys[contadoreAux] = hashAuxiliar[contadoreAux-1];
-      contadoreAux++;
-    }
-    
+
     //insere o filho de forma ordenada no nodo atual
     nodoInserimento->quantidadeFilhos++; 
-    contadoreAux = 0;
-    while(contadoreAux < nodoInserimento->quantidadeFilhos){
-      if(contadoreAux == (contadore+1))
-	nodoInserimento->filhos[contadoreAux] = filho;
-      else if(contadoreAux > (contadore+1))
-	nodoInserimento->filhos[contadoreAux] = filhosAux[contadoreAux-1];
-      contadoreAux++;
+    contadore = 0;
+    while(contadore < nodoInserimento->quantidadeFilhos){
+      if(contadore == (posicione+1))
+        nodoInserimento->filhos[contadore] = filho;
+      else if(contadore > (posicione+1))
+        nodoInserimento->filhos[contadore] = filhosAux[contadore-1];
+      contadore++;
     }
   }
+ 
   return nodoInserimento;
 }
 
@@ -254,8 +298,8 @@ int bulk_loading(nodo_t* &arvore, vind &indices, int ordem){
       if (j && filhoAtual->keys[j-1] == indices[iteradorIndices].hash) { j--; }
       else if (j == condicaoParaFor && indices[iteradorIndices].hash != filhoAtual->keys[j-1]) { break; }
       else {
-	filhoAtual->keys[j] = indices[iteradorIndices].hash;
-	filhoAtual->quantidadeKeys++;
+        filhoAtual->keys[j] = indices[iteradorIndices].hash;
+        filhoAtual->quantidadeKeys++;
       }
         
       //cria novo offset, passando como parametro o offset da hash atual e ligando o novo offset no começo da lista

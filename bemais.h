@@ -13,24 +13,24 @@ typedef unsigned long long int Hash;
 
 //indices para o vetor de indices (serao inseridos na arvore)
 typedef struct index_t{
-    Hash hash;
-    long long int offset;
+  Hash hash;
+  long long int offset;
 
 index_t(long long int _h, unsigned long int _o) : hash(_h), offset(_o) {}
 } index_t;
 
 //offsets. O prox e pra quando se tem mais de um hash igual
 typedef struct offsets_t{    //lista encadeada dos offsets
-    Offset offset;
-    struct offsets_t *prox;
+  Offset offset;
+  struct offsets_t *prox;
 } offsets_t;
 
 typedef struct nodo_t{
-    nodo_t **filhos, *prox, *pai;
-    offsets_t **offsets;
-    Hash *keys;
-    int quantidadeKeys, quantidadeFilhos;
-    bool folha;
+  nodo_t **filhos, *prox, *pai;
+  offsets_t **offsets;
+  Hash *keys;
+  int quantidadeKeys, quantidadeFilhos;
+  bool folha;
 }nodo_t;
 
 typedef vector<index_t> vind;
