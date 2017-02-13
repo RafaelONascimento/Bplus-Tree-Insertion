@@ -1,7 +1,6 @@
 #ifndef _BEMAIS_
 #define _BEMAIS_
 #include "bemais.h"
-#include <sstream>
 #include <string>
 #include <fstream>
 using namespace std;
@@ -37,12 +36,11 @@ Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]){
 }
 
 Offset adicionaLinha(char linhaInsercione[MAXLINHA],char arquivoDiretorio[200]){
-  stringstream ss;
   Offset offset = 0;
   string linha;
   ifstream arquivoLeitura; // abre o arquivo em modo de leitura
 
-  arquivoLeitura.open (arquivoDirtorio);
+  arquivoLeitura.open (arquivoDiretorio);
   if (arquivoLeitura.is_open()){
 	while (! arquivoLeitura.eof()){
 	  getline (arquivoLeitura,linha);  // Lê a linha do arquivo
@@ -50,7 +48,7 @@ Offset adicionaLinha(char linhaInsercione[MAXLINHA],char arquivoDiretorio[200]){
 	}
 	arquivoLeitura.close();
 	
-	FILE * arquivoGravacao = fopen(arquivoDirtorio, "a+");
+	FILE * arquivoGravacao = fopen(arquivoDiretorio, "a+");
 	fprintf(arquivoGravacao,"%s\n",linhaInsercione);
 	fclose(arquivoGravacao);
   }
