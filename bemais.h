@@ -46,13 +46,15 @@ bool compareIndex(const index_t &_a, const index_t &_b);
 //leh uma string dada, e separa o atributo desejado, retornando o hash do mesmo
 Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]);
 //Função que le o arquivo .csv e guarda as hashs e os offsets no vector de index_t
+
+//
 void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada);
-//Faz a insercao de um unico elemento na arvor
-nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo);
-//Busca do nodo para o algoritimo de insercao de elementos separados
+nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo, char file[200]);
 nodo_t* splitInsercao(nodo_t* &nodoInserimento,index_t valor, int ordem, nodo_t *filho);
 nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho);
 nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor);
+Offset adicionaLinha(char linhaInsercao[MAXLINHA],char arquivoDirtorio[200]);
+
 //BulkLoading
 //Função principal do Bulk Loading. Retorna se nenhum erro aconteceu.
 int bulk_loading(nodo_t* &arvore, vind &indices, int ordem);

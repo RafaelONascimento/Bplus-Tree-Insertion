@@ -1,7 +1,11 @@
 #ifndef _BEMAIS_
 #define _BEMAIS_
 #include "bemais.h"
+#include <sstream>
+#include <string>
+#include <fstream>
 using namespace std;
+
 
 Hash hashFunction(char *str) { //funcao hash vc djb2
   Hash hash = 5381;
@@ -26,10 +30,33 @@ Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]){
     if (linha[i] != '"') aux[j++] = linha[i];
   aux[j] = '\0';
   
-  //Pega o valor do HASH
+  //Pega o valor do HASH 
   hash = hashFunction(aux);
   
   return hash;
+}
+
+Offset adicionaLinha(char linhaInsercao[MAXLINHA],char arquivoDirtorio[200]){
+  stringstream ss;
+  Offset offset = 0;
+  string linha;
+  ifstream arquivoLeitura; // abre o arquivo em modo de leitura
+
+  arquivoLeitura.open (arquivoDirtorio);
+  if (arquivoLeitura.is_open()){
+	while (! arquivoLeitura.eof()){
+	  getline (arquivoLeitura,linha);  // Lê a linha do arquivo
+	  offset += linha.length();
+	}
+	arquivoLeitura.close();
+	
+	FILE * arquivoGravacao = fopen(arquivoDirtorio, "a+");
+	fprintf(arquivoGravacao,"%s\n",linhaInsercao);
+	fclose(arquivoGravacao);
+  }
+  else printf("Arquivo não encontrado!");
+  
+  return offset;
 }
 
 //Faz a leitura de um arquivo inteiro, gerando o hash dos atributos, e guardando em um vector
@@ -49,10 +76,12 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
   sort(indices.begin(), indices.end(), compareIndex);
 }
 
-nodo_t* insercaoElemento(nodo_t* &arvore,/*char linha[MAXLINHA]*/ Hash valor, int ordem, int nChar, int atributo){
+
+
+nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo, char file[200]){
   int aux = 0, flag = 0;
-  // Hash valor = leituraLinha(nChar,atributo,linha);
-  index_t valoreInserimento(valor,0);
+  Hash valor = leituraLinha(nChar,atributo,linha);
+  index_t valoreInserimento(valor,adicionaLinha(linha,file));
   offsets_t *offsetAux;
   nodo_t* nodoInserimento;
 
@@ -117,7 +146,7 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
     pai->filhos[1] = filhoDir;
     pai->pai = nodoInserimento->pai;
     nodoInserimento->pai = filhoDir->pai = (pai->pai != NULL) ? pai->pai : pai;
-    nodoInserimento->quantidadeKeys = (count);
+    nodoInserimento->quantidadeKeys =  (count);
 
     if(!nodoInserimento->folha)
       nodoInserimento->quantidadeFilhos = (++count);
@@ -134,7 +163,7 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
     while(!nodoInserimento->folha && count <= ordem){
       filhoDir->quantidadeFilhos++;
       filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count++];
-      filhoDir->filhos[(filhoDir->quantidadeFilhos)-1]->pai = filhoDir;
+	  filhoDir->filhos[(filhoDir->quantidadeFilhos)-1]->pai = filhoDir;
     }
 
     if(nodoInserimento->folha){
