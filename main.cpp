@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     case 3:
       printf("Digite o dado a ser inserido:\n");
       fgets(linha, MAXLINHA,stdin);
-      arvore = insercaoElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
+      arvore = insercioneElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
     } 
   }  
   mataArvore(arvore);
