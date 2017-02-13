@@ -36,7 +36,7 @@ Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]){
   return hash;
 }
 
-Offset adicionaLinha(char linhaInsercao[MAXLINHA],char arquivoDirtorio[200]){
+Offset adicionaLinha(char linhaInsercione[MAXLINHA],char arquivoDiretorio[200]){
   stringstream ss;
   Offset offset = 0;
   string linha;
@@ -51,7 +51,7 @@ Offset adicionaLinha(char linhaInsercao[MAXLINHA],char arquivoDirtorio[200]){
 	arquivoLeitura.close();
 	
 	FILE * arquivoGravacao = fopen(arquivoDirtorio, "a+");
-	fprintf(arquivoGravacao,"%s\n",linhaInsercao);
+	fprintf(arquivoGravacao,"%s\n",linhaInsercione);
 	fclose(arquivoGravacao);
   }
   else printf("Arquivo não encontrado!");
@@ -76,19 +76,17 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
   sort(indices.begin(), indices.end(), compareIndex);
 }
 
-
-
-nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo, char file[200]){
+nodo_t* insercioneElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo, char arquivo[200]){
   int aux = 0, flag = 0;
   Hash valor = leituraLinha(nChar,atributo,linha);
-  index_t valoreInserimento(valor,adicionaLinha(linha,file));
+  index_t valoreInserimento(valor,adicionaLinha(linha,arquivo));
   offsets_t *offsetAux;
   nodo_t* nodoInserimento;
 
   //Caso a arvore esteja vazia eh feita a alocao do primeiro nodo
   if(arvore == NULL)  nodoInserimento = criaNodo(ordem, true);
   //Se a arvore nao estiver vazia, e feito a busca pelo nodo a ser inserido o valor
-  else nodoInserimento = buscaInsercao(arvore, valor);
+  else nodoInserimento = buscaInsercione(arvore, valor);
 
   //Apos a busca verifica se o valor jah esta inserido no nodo folha
   while(aux < nodoInserimento->quantidadeKeys && !flag && !arvore->folha){
@@ -109,16 +107,16 @@ nodo_t* insercaoElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nC
     return arvore;
   }
   //Caso o valor nao estiver inserido ainda, eh chamado a funcao de split
-  else return splitInsercao(nodoInserimento,valoreInserimento,ordem,NULL);   
+  else return splitInsercione(nodoInserimento,valoreInserimento,ordem,NULL);   
 }
 
-nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho){
+nodo_t* splitInsercione(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t *filho){
   nodo_t *filhoDir, *pai, *paiAux;
   int contadore = 0, flag = 1, count = 0;
 
   //Caso haja espaco eh apenas inserido e ordenado 
   if(nodoInserimento->quantidadeKeys < ordem-1){
-    //Eh chamado a funcao de insercao ordenada no nodo
+    //Eh chamado a funcao de insercione ordenada no nodo
     nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
     //Faz a verificacao para encontra a raiz da arvore
     if(nodoInserimento->pai != NULL){
@@ -136,7 +134,7 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
     //Cria nodo que seja o novo pai;
     pai = criaNodo(ordem,false);
 
-    //chama a funcao de insercao ordenada no nodo atual
+    //chama a funcao de insercione ordenada no nodo atual
     nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
     count = (ordem/2);
     pai->quantidadeKeys++;
@@ -174,7 +172,7 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
     //Verifica se o nodo ao qual foi feito split tinha pai, se sim eh chamado a recursao para ele. caso nao tenha, eh apenas retornado o pai
     if(pai->pai != NULL){
       valor.hash = pai->keys[0];
-      return splitInsercao(pai->pai,valor,ordem,pai->filhos[1]);
+      return splitInsercione(pai->pai,valor,ordem,pai->filhos[1]);
     }
     else return pai;
   }
@@ -182,11 +180,11 @@ nodo_t* splitInsercao(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo_t
 
 nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ordem, nodo_t *filho){
   int contadore = 0 , flag = 1 , posicione = 0;
-  Hash hashAuxiliar[nodoInserimento->quantidadeKeys];
+  Hash hashAuxiliare[nodoInserimento->quantidadeKeys];
   offsets_t **offsetAux = (offsets_t**)malloc(sizeof(offsets_t*)*(ordem-1));
   nodo_t **filhosAux = (nodo_t**)malloc(sizeof(nodo_t*) * ordem);
   
-  //Encontra a posicao de insercao do valor na nodo atual
+  //Encontra a posicao de insercione do valor na nodo atual
   while(posicione < nodoInserimento->quantidadeKeys &&  flag){
     if(nodoInserimento->keys[posicione] > valor.hash) flag = 0;
     else posicione++;
@@ -194,7 +192,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
   
   //Copia as keys para um vetor de hash auxiliar
   while(contadore < nodoInserimento->quantidadeKeys){
-    hashAuxiliar[contadore] = nodoInserimento->keys[contadore];
+    hashAuxiliare[contadore] = nodoInserimento->keys[contadore];
     contadore++;
   }  
 
@@ -218,7 +216,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
     }
     else if (contadore >= posicione){
       //copia o valor do vetor auxiliar para a posicao correta/ordenada
-      nodoInserimento->keys[contadore] = hashAuxiliar[contadore-1];
+      nodoInserimento->keys[contadore] = hashAuxiliare[contadore-1];
       //copia o offset do vetor auxiliar para a posicao correta/ordenada
       if(nodoInserimento->folha)
         nodoInserimento->offsets[contadore] = offsetAux[contadore-1];
@@ -249,7 +247,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
   return nodoInserimento;
 }
 
-nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
+nodo_t* buscaInsercione(nodo_t* &nodoAtual, Hash valor){
   if(nodoAtual->folha) return nodoAtual;
   int contadore = 0, flag = 0;
   
@@ -258,8 +256,8 @@ nodo_t* buscaInsercao(nodo_t* &nodoAtual, Hash valor){
     else contadore++; 
   }
   
-  if(flag == 1) return buscaInsercao(nodoAtual->filhos[contadore],valor);
-  else return buscaInsercao(nodoAtual->filhos[nodoAtual->quantidadeFilhos-1],valor);
+  if(flag == 1) return buscaInsercione(nodoAtual->filhos[contadore],valor);
+  else return buscaInsercione(nodoAtual->filhos[nodoAtual->quantidadeFilhos-1],valor);
 }
 
 FILE* abrirArquivo(char arquivoEntrada[]){
