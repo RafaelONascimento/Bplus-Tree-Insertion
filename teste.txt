@@ -1,14 +1,22 @@
-3
-10,journals/tsp/SherlockM98,On the space of orthonormal wavelets.,Barry G. Sherlock   Donald M. Monro   ,1998
-3
-9,conf/aaai/DaiMW10,Decision-Theoretic Control of Crowd-Sourced Workflows.,Peng Dai   Mausam   Daniel S. Weld   ,2010
-3
-8,conf/ijcai/DaiMW09,Domain-Independent Automatic Partitioning for Probabilistic Planning.,Peng Dai   Mausam   Daniel S. Weld   ,2009
-3 
-7,conf/ilp/DomingosKLPRS08,Markov Logic.,Pedro Domingos   Stanley Kok   Daniel Lowd   Hoifung Poon   Matthew Richardson   Parag Singla   ,2008
-3
-6,conf/cg/Cazenave00,Abstract Proof Search.,Tristan Cazenave   ,2000
-3
-5,conf/dlog/KaminskiS09,Terminating Tableaux for SOQ with Number Restrictions on Transitive Roles.,Mark Kaminski   Gert Smolka   ,2009
-3	
-4,journals/eswa/ChenWL11,A general knowledge mediation infrastructure for multi-agent systems.,Kun Chen   Huaiqing Wang   Hokyin Lai   ,2011
+2
+rec_id,culture,sex,age,date_of_birth,title,given_name,surname,state,suburb,postcode,street_number,address_1,address_2,phone_number,soc_sec_id,blocking_number,family_role
+2
+rec-9555-org,chi,f,32,19841115,,samuel,chau,vic,westmelbourne,5114,6,cordeauxstreet,,61832733286,1160614,5,NoRole
+2
+rec-18106-org,unk,f,33,19830224,ms,nathan,schwanke,nsw,cawongla,2170,,porteouscrescent,,0229096216,7454546,2,NoRole
+2
+rec-43903-org,cze,f,7,20090816,,isabella,vasicak,qld,bororen,3214,26,burramurraavenue,,61347103905,4547174,1,NoRole
+2
+rec-27223-org,pol,f,32,19841231,dr,courtney,burstzyn,vic,ivanhoe,2117,26,rohanstreet,villa43,0445665776,9564723,0,NoRole
+2
+rec-5872-org,eng,m,,19020921,,cassandra,ibbott,vic,manifoldheights,4350,11,bellchamberscrescent,,0821761295,9467489,3,NoRole
+2
+rec-17851-org,ser,f,30,19861103,hon,luke,avdic,qld,meringandan,4306,85,burkittstreet,,0359806997,2252774,9,NoRole
+2
+rec-7480-org,afr,f,11,20050308,ms,jordan,jobe,qld,sunnynook,2099,16,hugslane,,0346411909,9181036,4,NoRole
+2
+rec-59601-org,usa,,22,19940722,,clement,meadows,nsw,chittawaypoint,2653,14,hawkenstreet,weemilah,0230559415,6564420,1,NoRole
+2
+rec-7281-org,unk,f,7,20090801,mr,lara,strapp,,loganholme,3496,44,ogilbycrescent,,0730812220,5149158,3,NoRole
+1
+0
