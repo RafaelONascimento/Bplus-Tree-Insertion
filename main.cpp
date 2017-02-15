@@ -42,7 +42,12 @@ int main(int argc, char *argv[]) {
     case 1:
       imprimeArvore(arvore);
       break;
-    case 3:
+    case 2:
+      printf("Digite o dado a ser inserido:\n");
+      fgets(linha, MAXLINHA,stdin);
+      arvore = insercioneElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
+	  break;
+	case 3:
       printf("Digite o texto a ser buscado\n");
       fgets(linha, MAXLINHA, stdin);
       linha[strlen(linha)-1] = '\0';
@@ -56,11 +61,6 @@ int main(int argc, char *argv[]) {
 		putchar('\n');
       }
       break;
-    case 2:
-      printf("Digite o dado a ser inserido:\n");
-      fgets(linha, MAXLINHA,stdin);
-      arvore = insercioneElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
-	  break;
 	default:
 	  printf("Opcao Invalida..\n");
 	  opMenu = 4;

@@ -570,8 +570,8 @@ void imprimeMenu(){
   printf("Digite a opção desejada\n");
   printf("0• Sair\n");
   printf("1• Imprimir a árvore\n");
-  printf("2• Buscar\n");
-  printf("3• Inserir elemento\n");
+  printf("2• Inserir elemento\n");
+  printf("3• Buscar\n");
 }
 
 #endif
