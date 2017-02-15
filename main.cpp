@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     leituraArquivo(indices, nChar, atributo, entrada);
     
     //realiza o bulkload que retornara 0 no sucesso
-	if(indices.size() != 0)
+	if(indices.size())
 	  if (bulk_loading(arvore, indices, ordem)) return 0;
     
     for (int i = 0; i < (int)indices.size(); i++)
@@ -42,13 +42,7 @@ int main(int argc, char *argv[]) {
     case 1:
       imprimeArvore(arvore);
       break;
-	
-    case 2:
-	  printf("Digite o dado a ser inserido:\n");
-      fgets(linha, MAXLINHA,stdin);
-	  arvore = insercioneElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
-	  break;
-   	case 3:
+    case 3:
       printf("Digite o texto a ser buscado\n");
       fgets(linha, MAXLINHA, stdin);
       linha[strlen(linha)-1] = '\0';
@@ -60,12 +54,21 @@ int main(int argc, char *argv[]) {
 		printf("\nResultados encontrados:\n");
 		imprimeTupla(nodoDeBusca, indiceBusca, entrada);
 		putchar('\n');
-	  }
+      }
+      break;
+    case 2:
+      printf("Digite o dado a ser inserido:\n");
+      fgets(linha, MAXLINHA,stdin);
+      arvore = insercioneElemento(arvore,linha,ordem,nChar,atributo,nomeArquivo);
 	  break;
-    } 
+	default:
+	  printf("Opcao Invalida..\n");
+	  opMenu = 4;
+	  break;
+	}	
   }  
-  // mataArvore(arvore);
-  	
+  //mataArvore(arvore);
+  
   //Verifica se o arquivo jah foi aberto
   if(entrada != NULL)  fclose(entrada);
   return 0;

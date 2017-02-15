@@ -38,9 +38,9 @@ Hash leituraLinha(int nChar, int atributo, char linha[MAXLINHA]){
 Offset adicionaLinha(char linhaInsercione[MAXLINHA],char arquivoDiretorio[200]){
   Offset offset = 0;
   string linha;
-  int qtdLinhas = 0;
   ifstream arquivoLeitura; // abre o arquivo em modo de leitura
-
+  int qtdLinhas = 0;
+  
   arquivoLeitura.open (arquivoDiretorio);
   if (arquivoLeitura.is_open()){
 	while (! arquivoLeitura.eof()){
@@ -56,8 +56,7 @@ Offset adicionaLinha(char linhaInsercione[MAXLINHA],char arquivoDiretorio[200]){
   }
   else printf("Arquivo não encontrado!");
   
-  return offset+(qtdLinhas-1);
-  
+  return offset+(qtdLinhas+1);
 }
 
 //Faz a leitura de um arquivo inteiro, gerando o hash dos atributos, e guardando em um vector
@@ -65,16 +64,17 @@ void leituraArquivo(vind &indices, int nChar, int atributo, FILE *entrada){
   char linha[MAXLINHA];
   Hash hash = 0;
   Offset offsetAux;
-  //Faz a leitura de todas as linhas do arquivo, e gera o hash do atributo desejado
-  	while (offsetAux = ftell(entrada), fgets(linha, MAXLINHA, entrada)) {
-	  hash = leituraLinha(nChar,atributo,linha);
-	  //empurra no vetor
-	  indices.push_back(index_t(hash, offsetAux));
-	}
 
-	//ordena de acordo com as hashs
-	sort(indices.begin(), indices.end(), compareIndex);
-}	
+  //Faz a leitura de todas as linhas do arquivo, e gera o hash do atributo desejado
+  while (offsetAux = ftell(entrada), fgets(linha, MAXLINHA, entrada)) {
+    hash = leituraLinha(nChar,atributo,linha);
+    //empurra no vetor
+    indices.push_back(index_t(hash, offsetAux));
+  }
+
+  //ordena de acordo com as hashs
+  sort(indices.begin(), indices.end(), compareIndex);
+}
 
 nodo_t* insercioneElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int nChar, int atributo, char arquivo[200]){
   int aux = 0, flag = 0;
@@ -82,23 +82,26 @@ nodo_t* insercioneElemento(nodo_t* &arvore,char linha[MAXLINHA], int ordem, int 
   index_t valoreInserimento(valor,adicionaLinha(linha,arquivo));
   offsets_t *offsetAux;
   nodo_t* nodoInserimento;
+
   //Caso a arvore esteja vazia eh feita a alocao do primeiro nodo
   if(arvore == NULL)  nodoInserimento = criaNodo(ordem, true);
   //Se a arvore nao estiver vazia, e feito a busca pelo nodo a ser inserido o valor
   else nodoInserimento = buscaInsercione(arvore, valor);
+
   //Apos a busca verifica se o valor jah esta inserido no nodo folha
-  while(aux < nodoInserimento->quantidadeKeys && !flag ){
+  while(aux < nodoInserimento->quantidadeKeys && !flag){
     if(nodoInserimento->keys[aux] == valor) flag = 1;
     else if(nodoInserimento->keys[aux++] > valor) flag = 2;
   }
+
   //Se o valor jah estiver na folha, soh eh inserido o offset na lista de offsets
   if(flag == 1){
 	offsetAux = nodoInserimento->offsets[aux];
     //procura o ultimo offset
-	while(offsetAux->prox != NULL)
-	  offsetAux = offsetAux->prox;
-	//adiciona o novo offset no prox do ultimo offset
-	offsetAux->prox = criaOffset(valoreInserimento.offset,NULL);
+    while(offsetAux->prox != NULL)
+      offsetAux = offsetAux->prox;
+    //adiciona o novo offset no prox do ultimo offset
+    offsetAux->prox = criaOffset(valoreInserimento.offset,NULL);
 	
     //returna a propria avore
     return arvore;
@@ -130,38 +133,40 @@ nodo_t* splitInsercione(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo
     filhoDir = criaNodo(ordem,nodoInserimento->folha);
     //Cria nodo que seja o novo pai;
     pai = criaNodo(ordem,false);
-	//chama a funcao de insercione ordenada no nodo atual
-	nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
-	count = (ordem/2);
+
+    //chama a funcao de insercione ordenada no nodo atual
+    nodoInserimento = sortMiracolosoInsercione(nodoInserimento, valor, ordem,filho);
+    count = (ordem/2);
     pai->quantidadeKeys++;
     pai->keys[0] = nodoInserimento->keys[count];
-	pai->quantidadeFilhos = 2;
+    pai->quantidadeFilhos = 2;
     pai->filhos[0] = nodoInserimento;
     pai->filhos[1] = filhoDir;
     pai->pai = nodoInserimento->pai;
     nodoInserimento->pai = filhoDir->pai = (pai->pai != NULL) ? pai->pai : pai;
-    nodoInserimento->quantidadeKeys =  (count);
-
-	if(!nodoInserimento->folha)
+	
+	nodoInserimento->quantidadeKeys =  (count);
+    if(!nodoInserimento->folha)
       nodoInserimento->quantidadeFilhos = (++count);
 
     //copia as keys para o filho da direta 
     while(count < ordem){
-      filhoDir->quantidadeKeys++;
+	  filhoDir->quantidadeKeys++;
 	  filhoDir->keys[(filhoDir->quantidadeKeys)-1] = nodoInserimento->keys[count];
 	  if(nodoInserimento->folha)
 		filhoDir->offsets[(filhoDir->quantidadeKeys)-1] = nodoInserimento->offsets[count];
 	  count++;
-    }
+	}
     
     count = (ordem/2)+1;
 
     //copia os filhos para o filho da direita
     while(!nodoInserimento->folha && count <= ordem){
       filhoDir->quantidadeFilhos++;
-      filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count++];
+      filhoDir->filhos[(filhoDir->quantidadeFilhos)-1] = nodoInserimento->filhos[count];
 	  filhoDir->filhos[(filhoDir->quantidadeFilhos)-1]->pai = filhoDir;
-	}
+	  count++;
+    }
 	
     if(nodoInserimento->folha){
       pai->keys[0] = filhoDir->keys[0];
@@ -171,9 +176,7 @@ nodo_t* splitInsercione(nodo_t* &nodoInserimento, index_t valor, int ordem, nodo
     //Verifica se o nodo ao qual foi feito split tinha pai, se sim eh chamado a recursao para ele. caso nao tenha, eh apenas retornado o pai
     if(pai->pai != NULL){
       valor.hash = pai->keys[0];
-	  free(pai);
-	  pai = NULL;
-      return splitInsercione(filhoDir->pai,valor,ordem,filhoDir);
+      return splitInsercione(pai->pai,valor,ordem,pai->filhos[1]);
     }
     else return pai;
   }
@@ -201,7 +204,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
   contadore = 0;
   while(nodoInserimento->folha && contadore < nodoInserimento->quantidadeKeys){
     offsetAux[contadore] = nodoInserimento->offsets[contadore];
-	contadore++;
+    contadore++;
   }
   
   //Insere de forma ordena o valor e offset na nodo atual
@@ -244,7 +247,7 @@ nodo_t* sortMiracolosoInsercione(nodo_t* &nodoInserimento,index_t valor, int ord
       contadore++;
     }
   }
-  
+ 
   return nodoInserimento;
 }
 
@@ -567,8 +570,8 @@ void imprimeMenu(){
   printf("Digite a opção desejada\n");
   printf("0• Sair\n");
   printf("1• Imprimir a árvore\n");
-  printf("2• Inserir elemento\n");
-  printf("3• Buscar\n");
+  printf("2• Buscar\n");
+  printf("3• Inserir elemento\n");
 }
 
 #endif
